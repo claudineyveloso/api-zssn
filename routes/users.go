@@ -77,3 +77,22 @@ func GetUsers(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
 	}
 
 }
+
+func DeleteUser(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
+	userID := r.URL.Query().Get("id")
+	parsedUserID, err := uuid.Parse(userID)
+	if err != nil {
+		http.Error(w, "ID do usuário não pode ser vazio", http.StatusBadRequest)
+		return
+	}
+
+	err = queries.DeleteUser(r.Context(), parsedUserID)
+	if err != nil {
+    http.Error(w, fmt.Sprintf("Erro ao excluir o usuário: %v", err), http.StatusInternalServerError)
+    return
+  }
+  w.WriteHeader(http.StatusOK)
+  fmt.Fprintln(w, "Usuário excluído com sucesso!")
+
+
+}

@@ -48,7 +48,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 }
 
 const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM users WHERE id = $1 RETURNING id, name, age, gender, latitude, longitude, infected, contamination_notification, created_at, updated_at
+DELETE FROM users WHERE id = $1
 `
 
 func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
@@ -117,7 +117,7 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 }
 
 const updateUser = `-- name: UpdateUser :exec
-UPDATE users SET name = $2, age = $3, gender = $4, latitude = $5, longitude = $6 WHERE id = $1 RETURNING id, name, age, gender, latitude, longitude, infected, contamination_notification, created_at, updated_at
+UPDATE users SET name = $2, age = $3, gender = $4, latitude = $5, longitude = $6 WHERE id = $1
 `
 
 type UpdateUserParams struct {

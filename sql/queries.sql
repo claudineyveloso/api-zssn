@@ -9,7 +9,7 @@ SELECT * FROM users WHERE id = $1;
 SELECT * FROM users;
 
 -- name: DeleteUser :exec
-DELETE FROM users WHERE id = $1 RETURNING *;
+DELETE FROM users WHERE id = $1;
 
 -- name: UpdateUser :exec
-UPDATE users SET name = $2, age = $3, gender = $4, latitude = $5, longitude = $6 WHERE id = $1 RETURNING *;
+UPDATE users SET name = $2, age = $3, gender = $4, latitude = $5, longitude = $6 WHERE id = $1;
