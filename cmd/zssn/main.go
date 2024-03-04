@@ -39,16 +39,23 @@ func main() {
 	}
 	fmt.Println("Conectou com o banco de dados!")
 
-
 	dbUser := db.New(dbConn)
 
 	http.HandleFunc("/create_user", func(w http.ResponseWriter, r *http.Request) {
 		routes.CreateUser(w, r, dbUser)
-  })
+	})
+
+	http.HandleFunc("/get_user", func(w http.ResponseWriter, r *http.Request) {
+		routes.GetUser(w, r, dbUser)
+	})
 
 	http.HandleFunc("/get_users", func(w http.ResponseWriter, r *http.Request) {
-    routes.GetUsers(w, r, dbUser)
-  })
+		routes.GetUsers(w, r, dbUser)
+	})
+
+	http.HandleFunc("/delete_user", func(w http.ResponseWriter, r *http.Request) {
+		routes.DeleteUser(w, r, dbUser)
+	})
 
 	http.ListenAndServe(":8080", nil)
 

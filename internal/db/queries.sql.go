@@ -13,6 +13,74 @@ import (
 	"github.com/google/uuid"
 )
 
+const createInfected = `-- name: CreateInfected :exec
+INSERT INTO Infecteds ( user_id_reported, user_id_notified, created_at, updated_at)
+VALUES ($1, $2, $3, $4)
+`
+
+type CreateInfectedParams struct {
+	UserIDReported uuid.UUID
+	UserIDNotified uuid.UUID
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
+func (q *Queries) CreateInfected(ctx context.Context, arg CreateInfectedParams) error {
+	_, err := q.db.ExecContext(ctx, createInfected,
+		arg.UserIDReported,
+		arg.UserIDNotified,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
+const createInventory = `-- name: CreateInventory :exec
+INSERT INTO inventories ( ID, user_id, created_at, updated_at)
+VALUES ($1, $2, $3, $4)
+`
+
+type CreateInventoryParams struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (q *Queries) CreateInventory(ctx context.Context, arg CreateInventoryParams) error {
+	_, err := q.db.ExecContext(ctx, createInventory,
+		arg.ID,
+		arg.UserID,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
+const createItem = `-- name: CreateItem :exec
+INSERT INTO items ( ID, description, score, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5)
+`
+
+type CreateItemParams struct {
+	ID          uuid.UUID
+	Description string
+	Score       int32
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) error {
+	_, err := q.db.ExecContext(ctx, createItem,
+		arg.ID,
+		arg.Description,
+		arg.Score,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
 const createUser = `-- name: CreateUser :exec
 INSERT INTO users ( ID, name, age, gender, latitude, longitude, infected, contamination_notification, created_at, updated_at)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -116,6 +184,22 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
+const updateLocation = `-- name: UpdateLocation :exec
+UPDATE users SET latitude = $2, longitude = $3 WHERE id = $1
+`
+
+type UpdateLocationParams struct {
+	ID        uuid.UUID
+	Latitude  string
+	Longitude string
+	UpdatedAt time.Time
+}
+
+func (q *Queries) UpdateLocation(ctx context.Context, arg UpdateLocationParams) error {
+	_, err := q.db.ExecContext(ctx, updateLocation, arg.ID, arg.Latitude, arg.Longitude, arg.UpdatedAt)
+	return err
+}
+
 const updateUser = `-- name: UpdateUser :exec
 UPDATE users SET name = $2, age = $3, gender = $4, latitude = $5, longitude = $6 WHERE id = $1
 `
@@ -127,6 +211,7 @@ type UpdateUserParams struct {
 	Gender    string
 	Latitude  string
 	Longitude string
+	UpdatedAt time.Time
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {

@@ -45,12 +45,32 @@ func CreateUser(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
 		http.Error(w, "Erro ao criar usuário", http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
-	// Codifique os dados do usuário em formato JSON e envie-os como resposta
+
+	if err := CreateInventory(w, r, queries, user.ID); err != nil {
+		http.Error(w, "Erro ao criar inventário para o usuário", http.StatusInternalServerError)
+		return
+	}
+
+	// Encode user data in JSON format and send it as a response
 	if err := json.NewEncoder(w).Encode(user); err != nil {
 		http.Error(w, "Erro ao codificar resposta", http.StatusInternalServerError)
 		return
 	}
+}
+
+func GetUser(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
+	userID := r.URL.Query().Get("id")
+	parsedUserID, err := uuid.Parse(userID)
+	if err != nil {
+		http.Error(w, "ID do usuário não pode ser vazio", http.StatusBadRequest)
+		return
+	}
+	user, err := queries.GetUser(r.Context(), parsedUserID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Erro ao obter usuário: %v", err), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(user)
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
@@ -59,7 +79,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
 		http.Error(w, fmt.Sprintf("Erro ao obter usuário: %v", err), http.StatusInternalServerError)
 		return
 	}
-
 
 	jsonData, err := json.MarshalIndent(users, "", " ")
 	if err != nil {
@@ -88,11 +107,56 @@ func DeleteUser(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
 
 	err = queries.DeleteUser(r.Context(), parsedUserID)
 	if err != nil {
-    http.Error(w, fmt.Sprintf("Erro ao excluir o usuário: %v", err), http.StatusInternalServerError)
-    return
-  }
-  w.WriteHeader(http.StatusOK)
-  fmt.Fprintln(w, "Usuário excluído com sucesso!")
+		http.Error(w, fmt.Sprintf("Erro ao excluir o usuário: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, "Usuário excluído com sucesso!")
 
+}
+
+func UpdateLocation(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
+	var user db.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Erro ao ler dados do usuário: %v", err), http.StatusBadRequest)
+		return
+	}
+	user.UpdatedAt = time.Now()
+	err = queries.UpdateLocation(r.Context(), db.UpdateLocationParams{
+		Latitude:  user.Latitude,
+		Longitude: user.Longitude,
+		UpdatedAt: user.UpdatedAt,
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Erro ao atualizar usuário: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func UpdateUser(w http.ResponseWriter, r *http.Request, queries *db.Queries) {
+	var user db.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Erro ao ler dados do usuário: %v", err), http.StatusBadRequest)
+		return
+	}
+	user.UpdatedAt = time.Now()
+	err = queries.UpdateUser(r.Context(), db.UpdateUserParams{
+		ID:        user.ID,
+		Name:      user.Name,
+		Age:       user.Age,
+		Gender:    user.Gender,
+		Latitude:  user.Latitude,
+		Longitude: user.Longitude,
+		UpdatedAt: user.UpdatedAt,
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Erro ao atualizar usuário: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 
 }

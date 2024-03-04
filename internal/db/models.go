@@ -43,14 +43,14 @@ type Item struct {
 }
 
 type User struct {
-	ID                        uuid.UUID 		`json:"id"`
-	Name                      string				`json:"name"`
-	Age                       int32					`json:"age"`
-	Gender                    string				`json:"gender"`
-	Latitude                  string				`json:"latitude"`
-	Longitude                 string				`json:"longitude"`
-	Infected                  sql.NullBool	`json:"infected"`
-	ContaminationNotification sql.NullInt32	`json:"contamination_notification"`
-	CreatedAt                 time.Time			`json:"created_at"`
-	UpdatedAt                 time.Time			`json:"updated_at"`
+	ID                        uuid.UUID     `json:"id"`
+	Name                      string        `json:"name"`
+	Age                       int32         `json:"age"`
+	Gender                    string        `json:"gender"`
+	Latitude                  string        `json:"latitude"`
+	Longitude                 string        `json:"longitude"`
+	Infected                  sql.NullBool  `json:"infected"`
+	ContaminationNotification sql.NullInt32 `json:"contamination_notification"`
+	CreatedAt                 time.Time     `json:"created_at"`
+	UpdatedAt                 time.Time     `json:"updated_at"`
 }
